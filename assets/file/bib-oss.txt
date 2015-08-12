@@ -1,0 +1,7 @@
+@InProceedings{singa-oss,
+  Title                    = {{SINGA}: A Distributed Deep Learning Platform},
+  Author                   = {Beng Chin Ooi and Kian-Lee Tan and Sheng Wang and Wei Wang and Qingchao Cai and
+    Gang Chen and Jinyang Gao and Zhaojing Luo and Anthony K. H. Tung and Yuan Wang and Zhongle Xie and Meihui Zhang and Kaiping Zheng},
+  Booktitle                = {ACM Multimedia},
+  Year                     = {2015}
+}

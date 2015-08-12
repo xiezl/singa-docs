@@ -1,0 +1,6 @@
+@InProceedings{singa-mm,
+  Title                    = {{SINGA}: Putting Deep Learning in the Hands of Multimedia Users},
+  Author                   = {Wei Wang and Gang Chen and Tien Tuan Anh Dinh and Jinyang Gao and Beng Chin Ooi and Kian-Lee Tan and Sheng Wang},
+  Booktitle                  = {ACM Multimedia},
+  Year                     = {2015},
+}

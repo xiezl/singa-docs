@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{{ page.title }}</title>
+    {% if page.description %}<meta name="description" content="{{ page.description }}">{% endif %}
+    <meta name="author" content="{{ site.author.name }}">
+
+    <!-- Enable responsive viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+
+    <!-- Le styles -->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <!--<link href="{{ ASSET_PATH }}/bootstrap/css/bootstrap.2.2.2.min.css" rel="stylesheet">-->
+    <link href="{{ ASSET_PATH }}/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ ASSET_PATH }}/css/favicon.ico">
+
+    <!-- atom & rss feed -->
+    <link href="{{ BASE_PATH }}{{ site.JB.atom_path }}" type="application/atom+xml" rel="alternate" title="Sitewide ATOM Feed">
+    <link href="{{ BASE_PATH }}{{ site.JB.rss_path }}" type="application/rss+xml" rel="alternate" title="Sitewide RSS Feed">
+
+    <!-- toc -->
+    <script src="{{ ASSET_PATH }}/js/toc.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+        $('.dropdown-toggle').dropdown();
+        $('#toc').toc();
+        });
+    </script>
+    <style >
+        .clickable-header {
+            cursor:pointer;
+        }
+        .clickable-header:hover {
+            text-decoration:underline;
+        }
+        .top-level-header {
+            display:inline;
+        }
+        .back-to-top {
+            margin-left:5px;
+              cursor:pointer;
+        }
+        #backtotop {
+          position: fixed;
+          left: 50%;
+          bottom: 100px;
+          margin-left:520px;
+          width: 30px;
+          height: 30px;
+        }
+        #toc, .toc, .mw-warning {
+          background-color: #FFF;
+          border-left: 1px solid #AAAAAA;
+          font-size: 95%;
+          padding-top: 50px;
+          position: fixed;
+          top: 0px;
+          left: 50%;
+          margin-left: 520px;
+        }
+        #toc strong{
+          margin:20px;
+        }
+    </style>
+
+  </head>
+
+  <body>
+  <div id="topanchor"></div>
+  <nav class="navbar navbar-default" >
+    <div class="navbar-fluid">
+      <div class="container-narrow">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed"
+          data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="{{ BASE_PATH }}/">{{ site.title }}</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li> <a href="http://www.comp.nus.edu.sg/~dbsystem/index.html">DBSystem</a> </li>
+            <li> <a href="http://singa.incubator.apache.org">Apache Website</a> </li>
+            <li> <a href="docs.html">Documentation</a></li>
+            <li> <a href="blog.html">Blog</a> </li>
+            <!--{% assign pages_list = site.pages %}
+            {% assign group = 'navigation' %}
+            {% include JB/pages_list %}-->
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"
+                role="button" aria-expanded="false">Development
+                <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="{{ BASE_PATH }}/dev/contribute">How to contribute</a></li>
+                <li><a href="{{ BASE_PATH }}/dev/community">Community</a></li>
+                <li><a href="{{ BASE_PATH }}/dev/schedule">Schedule</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div id="banner">
+  <a href="https://github.com/apache/incubator-singa" style="float: left"><img style="position: relative; top: -9px;
+    left: 0; border: 0;"
+    src="https://camo.githubusercontent.com/8b6b8ccc6da3aa5722903da7b58eb5ab1081adee/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f6f72616e67655f6666373630302e706e67"
+    alt="Fork me on GitHub"
+    data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_orange_ff7600.png"></a>
+
+      <div id="logos">
+        <img class="singa-logo" src="{{ BASE_PATH }}/assets/image/singa-logo.png" alt=""/>
+        <div>
+          <img class="incubator-logo" src="{{ BASE_PATH }}/assets/image/incubator.png"/>
+          <span> A General Distributed Deep Learning Platform</span>
+      </div>
+      </div>
+    </div>
+    <div class="container-narrow">
+      <div class="content">
+        {{ content }}
+      </div>
+      <hr>
+      <footer>
+        <p>Copyright &copy; {{ site.time | date: '%Y' }}
+        DBSystem Group of National University of Singapore
+        <a href="./privacy.html"> Privacy Policy </a>.
+        </p>
+      </footer>
+
+    </div>
+
+    <!-- back to top
+    <div id="backtotop">
+      <a href="#topanchor"><i class="icon-arrow-up back-to-top"></i>Top</a>
+    </div>-->
+
+    {% include JB/analytics %}
+  </body>
+</html>
