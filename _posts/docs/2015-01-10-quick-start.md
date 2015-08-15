@@ -6,13 +6,6 @@ tags : [installation, examples]
 ---
 {% include JB/setup %}
 
-## Notice!
-
-The newest code has dependency on zookeeper. Please install the zookeeper by
-
-    cd thirdparty
-    ./install.sh zookeeper
-
 ## Installation
 
 Clone the SINGA code from [Github](https://github.com/apache/incubator-singa)
@@ -27,25 +20,47 @@ Compile SINGA:
     ./configure
     make
 
-If there are dependent libraries missing, please refer to
-[installation]({{ BASE_PATH }}{% post_url /docs/2015-01-20-installation %}) page
+If there are dependent libraries missing, please refer to the
+[installation]({{ BASE_PATH }}/docs/installation %}) page
 for guidance on installing them.
+
+### Start Zookeeper
+
+SINGA uses [zookeeper](https://zookeeper.apache.org/) to coordinate the
+training.  Please make sure the zookeeper service is on before running SINGA.
+
+If you installed the zookeeper using our thirdparty script, you can
+simply start it by:
+
+    #goto top level folder
+    cd  SINGA_ROOT
+    ./bin/zk-service start
+
+Otherwise, if you launched a zookeeper by yourself but not used the
+default port, please edit the `conf/singa.conf`:
+
+    zookeeper_host: "localhost:YOUR_PORT"
 
 ## Run in standalone mode
 
-Running SINGA in standalone mode is on the contrary of running it on Mesos or
-YARN. For standalone mode, users have to manage the resources manually. For
+Running SINGA in standalone mode is on the contrary of running it using cluster
+managers like Mesos or YARN.
+
+{% comment %}
+For standalone mode, users have to manage the resources manually. For
 instance, they have to prepare a host file containing all running nodes.
-There is no management on CPU and memory resources, hence SINGA consumes as much
+There is no restriction on CPU and memory resources, hence SINGA consumes as much
 CPU and memory resources as it needs.
+{% endcomment %}
 
 ### Training on a single node
 
-For single node training, one process will be launched to run the SINGA code on
-the node where SINGA is started. We train the [CNN model](http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks) over the
+For single node training, one process will be launched to run SINGA on
+local host. We train the [CNN model](http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks) over the
 [CIFAR-10](http://www.cs.toronto.edu/~kriz/cifar.html) dataset as an example.
 The hyper-parameters are set following
-[cuda-convnet](https://code.google.com/p/cuda-convnet/).
+[cuda-convnet](https://code.google.com/p/cuda-convnet/). More details is
+available at [cnn example]({{ BASE_PATH }}/docs/cnn).
 
 
 #### Data and model preparation
@@ -56,95 +71,112 @@ Download the dataset and create the data shards for training and testing.
     make download
     make create
 
-A training dataset and a test dataset are created under *train-shard* and
-*test-shard* folder respectively. A image_mean.bin file is also generated, which
-contains the feature mean of all images.
-<!--After creating the data shards, you  to update the paths in the
-model configuration file (*model.conf*) for the
-training data shard, test data shard and the mean file.-->
+A training dataset and a test dataset are created under *cifar10-train-shard*
+and *cifar10-test-shard* folder respectively. An image_mean.bin file is also
+generated, which contains the feature mean of all images.
 
-Since all modules used for training this CNN model are provided by SINGA as
-built-in modules, there is no need to write any code. Instead, you just
-executable the running script (*../../bin/singa-run.sh*) by providing the model configuration file
-(*model.conf*).  If you want to implement your own modules, e.g., layer,
-then you have to register your modules in the driver code. After compiling the
-driver code, link it with the SINGA library to generate the executable. More
-details are described in [Code your own models]().
+Since all code used for training this CNN model is provided by SINGA as
+built-in implementation, there is no need to write any code. Instead, users just
+execute the running script (*../../bin/singa-run.sh*) by providing the job
+configuration file (*job.conf*). To code in SINGA, please refer to the
+[programming guide]({{ BASE_PATH }}/docs/programming-guide).
 
-#### Training without partitioning
+#### Training without parallelism
 
-To train the model without any partitioning, you just set the numbers
-in the cluster configuration file (*cluster.conf*) as :
+By default, the cluster topology has a single worker and a single server.
+In other words, neither the training data nor the neural net is partitioned.
 
-    nworker_groups: 1
-    nworkers_per_group: 1
-    nserver_groups: 1
-    nservers_per_group: 1
+The training is started by running:
 
+    #goto top level folder
+    cd ../../
+    ./bin/singa-run.sh -conf examples/cifar10/job.conf
+
+
+{% comment %}
 One worker group trains against one partition of the training dataset. If
 *nworker_groups* is set to 1, then there is no data partitioning. One worker
 runs over a partition of the model. If *nworkers_per_group* is set to 1, then
 there is no model partitioning. More details on the cluster configuration are
 described in the [System Architecture]() page.
+{% endcomment %}
 
-Start the training by running:
+#### Asynchronous parallel training
 
-    #goto top level folder
-    cd ../../
-    ./bin/singa-run.sh -model=examples/cifar10/model.conf -cluster=examples/cifar10/cluster.conf
+    # job.conf
+    ...
+    cluster {
+      nworker_groups: 2
+      nworkers_per_procs: 2
+      workspace: "examples/cifar10/"
+    }
 
-You can reduce the total number of training steps e.g., to 700 steps, in
-model.conf to make the program stop earlier. Otherwise it would take a long
-time to finish all 70,000 training steps on CPU.
+Change the original job.conf with the above cluster setting. By default, each
+worker group has one worker. Since one process is set to contain two workers.
+The two worker groups will run in the same process.  Consequently, they run
+the in-memory [Downpour]({{ BASE_PATH }}/docs/distributed-training) training framework.
+Users do not need to split the dataset
+explicitly for each worker (group); instead, they can assign each worker (group) a
+random offset to the start of the dataset. Consequently, the workers run like on
+different data partitions.
 
-Another simple example is training [a deep simple MLP](http://people.idsia.ch/~ciresan/data/NNtricks.pdf)
-over the [MNIST](http://yann.lecun.com/exdb/mnist/) dataset. The running flow
-is almost the same as running the cifar example. The files are under
-`examples/mnist` folder. Feel free to have a try.
+    # job.conf
+    ...
+    neuralnet {
+      layer {
+        ...
+        sharddata_conf {
+          random_skip: 5000
+        }
+      }
+      ...
+    }
 
-#### Training with data Partitioning
+The running command is:
 
-    nworker_groups: 2
-    nserver_groups: 1
-    nservers_per_group: 1
-    nworkers_per_group: 1
-    nworkers_per_procs: 2
-    workspace: "examples/cifar10/"
+    ./bin/singa-run.sh -conf examples/cifar10/job.conf
 
-The above cluster configuration file specifies two worker groups and one server
-group.  Worker groups run asynchronously but share the memory space for
-parameter values. In other words, it runs as the Hogwild algorithm. Since it is
-running in a single node, we can avoid partitioning the dataset explicitly. In
-specific, a random start offset is assigned to each worker group such that they
-would not work on the same mini-batch for every iteration. Consequently, they
-run like on different data partitions. The running command is the same:
+#### Synchronous parallel training
 
-    ./bin/singa-run.sh -model=examples/cifar10/model.conf -cluster=examples/cifar10/cluster.conf
+    # job.conf
+    ...
+    cluster {
+      nworkers_per_group: 2
+      nworkers_per_procs: 2
+      workspace: "examples/cifar10/"
+    }
 
-
-#### Training with model Partitioning
-
-    nworker_groups: 1
-    nserver_groups: 1
-    nservers_per_group: 1
-    nworkers_per_group: 2
-    nworkers_per_procs: 2
-    workspace: "examples/cifar10/"
-
-The above cluster configuration specifies one worker group with two workers.
-The workers run synchronously, i.e., they are synchronized after one iteration.
+Change the original job.conf with the above cluster configuration.
+It sets one worker group with two workers. The workers will run synchronously
+as they are from the same worker group. This framework is in-memory
+[sandblaster]({{ BASE_PATH }}/docs/distributed-training).
 The model is partitioned among the two workers. In specific, each layer is
 sliced such that every worker is assigned one sliced layer.  The sliced layer
 is the same as the original layer except that it only has B/g feature
 instances, where B is the size of instances in a mini-batch, g is the number of
-workers in a group.
-
+workers in a group. It is also possible to partition the layer (or neural net)
+using [other schemes]({{ BASE_PATH }}/docs/neural-net).
 All other settings are the same as running without partitioning
 
-    ./bin/singa-run.sh -model=examples/cifar10/model.conf -cluster=examples/cifar10/cluster.conf
+    ./bin/singa-run.sh -conf examples/cifar10/job.conf
 
 ### Training in a cluster
 
+We can extend the above two training frameworks to a cluster by updating the
+cluster configuration with:
+
+    nworker_per_procs: 1
+
+Every process would then create only one worker thread. The hostfile
+must be provided in SINGA_ROOT/hostfile specifying the nodes in the cluster,
+e.g.,
+
+    logbase-a01
+    logbase-a02
+
+The running command is the same as for single node training:
+
+    ./bin/singa-run.sh -conf examples/cifar10/job.conf
 
 ## Run with Mesos
 

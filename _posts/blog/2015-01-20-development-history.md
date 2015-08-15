@@ -20,7 +20,11 @@ tags : [development, history]
 
 * ***Wang Wei***
 
-  Add documentation for [Programming model]({{ BASE_PATH }}{%post_url /docs/2015-03-10-programming-model %})
+  Add documentation for [Programming model]()
+
+{% comment %}
+({{ BASE_PATH }}{%post_url /docs/2015-03-10-programming-model %})
+{% endcomment %}
 
 #####[Report] 2015-03-04
 
@@ -54,7 +58,11 @@ tags : [development, history]
     <img src="{{ BASE_PATH }}/assets/image/history/1server4threads-mlp.png" align="center" width="400px"/>
 
   * Neural Network Partition. We support layer partition, data partition and hybrid partition.
-    Refer to [NeuralNet Partition]({{ BASE_PATH }}{%post_url /docs/2015-02-30-neuralnet-partition %}) for details.
+    Refer to [NeuralNet Partition]() for more details.
+
+{% comment %}
+({{ BASE_PATH }}{%post_url /docs/2015-02-30-neuralnet-partition %}) for
+{% endcomment %}
 
   * Multi-threading. Multi-threading is support to exploit CPUs with multiple (>=4) cores.
 

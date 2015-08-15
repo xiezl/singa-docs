@@ -1,117 +1,140 @@
 ---
 layout: post
 title: Installation
-category : docs
-tags : [installation, examples]
+category: docs
 ---
 {% include JB/setup %}
 
-##Dependencies
 
-SINGA is developed and tested on Linux platforms with the following external
-libraries.
+### Dependencies
 
-* gflags version 2.1.1, use the default setting for namespace (i.e., gflags).
+SINGA is developed and tested on Linux platforms with the following external libraries.
 
-* glog version 0.3.3.
+The following dependenies are required:
 
-* google-protobuf version 2.6.0.
+  * glog version 0.3.3.
 
-* openblas version >= 0.2.10.
+  * google-protobuf version 2.6.0.
 
-* opencv version 2.4.9.
+  * openblas version >= 0.2.10.
 
-* zeromq version >= 3.2
+  * zeromq version >= 3.2
 
-* czmq version >= 3
+  * czmq version >= 3
 
-* zookeeper version >= 3.4.6
-
-Tips:
-For libraries like openblas, opencv, older versions may also
-work, because we do not use any newly added features.
+  * zookeeper version 3.4.6
 
 
-##Building SINGA From Sources
+Optional dependencies include:
 
-The build system of SINGA is based on GNU autotools. To build singa, you need
-gcc version >= 4.8.
+  * gtest version 1.7.0.
+
+  * opencv version 2.4.9.
+
+  * lmdb version 0.9.10
+
+
+SINGA comes with a script for installing the external libraries (see below).
+
+### Build SINGA From Source
+
+The build system of SINGA is based on GNU autotools. To build singa, you need gcc version >= 4.8.
 The common steps to build SINGA can be:
 
-  1.Extract source files;
-  2.Run configure script to generate makefiles;
-  3.Build and install SINGA.
+	1.Extract source files;
+	2.Run configure script to generate makefiles;
+	3.Build SINGA.
 
-On Unix-like systems with GNU Make as build tool, these build steps can
-be summarized by the following sequence of commands executed in a shell.
+On Unix-like systems with GNU Make as build tool, these build steps can be
+summarized by the following sequence of commands executed in a shell.
 
     $ cd SINGA/FOLDER
     $ ./configure
     $ make
-    $ make install
 
-After executing above commands, SINGA library will be installed
-in the system default directory.
-If you want to specify your own installation directory, use the
-following command instead.
+After compiling SINGA successfully, the `libsinga.so` will be generated into
+.lib/ folder and an executable file `singa` is generated under bin/.
+In certain cases, you may want to build SINGA with optional library supports.
+For example, to install SINGA library with lmdb support, you can run:
 
-    $ ./configure --prefix=/YOUR/OWN/FOLDER
+	$ ./configure --enable-lmdb
 
-The result of configure script will indicate you whether there any dependency
-is missing in your system.
-
-## Install missing dependencies
-If you haven't installed the dependencies, you can run
-the following commands to download & install the thirdparty dependencies:
+If some dependent libraries are missing (or not detected), the above command
+will fail with details on the missing libraries.
+To download & install thirdparty dependencies:
 
     $ cd thirdparty
     $ ./install.sh MISSING_LIBRARY_NAME1 YOUR_INSTALL_PATH1 MISSING_LIBRARY_NAME2 YOUR_INSTALL_PATH2 ...
 
-If you do not specify the installation path, the library
-will be installed in default folder.
-For example, if you want to build zeromq library in system
-folder and gflags in /usr/local, just run:
+If you do not specify the installation path, the library will be installed in default folder.
+For example, if you want to build zeromq library in system folder and gflags in /usr/local, just run:
 
     $ ./install.sh zeromq gflags /usr/local
 
-Another example can be to install all dependencies in /usr/local directory:
+You can also install all dependencies in /usr/local directory:
 
     $ ./install.sh all /usr/local
 
 Here is a table showing the first arguments:
 
     MISSING_LIBRARY_NAME  LIBRARIES
-    cmake         cmake tools
-    czmq*         czmq lib
-    gflags          gflags lib
-    glog          glog lib
-    lmdb          lmdb lib
-    OpenBLAS        OpenBLAS lib
-    opencv          OpenCV
-    protobuf        Google protobuf
-    zeromq          zeromq lib
-    zookeeper       Apache zookeeper
+    cmake                 cmake tools
+    czmq*                 czmq lib
+    gflags                gflags lib
+    glog                  glog lib
+    lmdb                  lmdb lib
+    OpenBLAS              OpenBLAS lib
+    opencv                OpenCV
+    protobuf              Google protobuf
+    zeromq                zeromq lib
+    zookeeper             Apache zookeeper
 
-*: Since czmq depends on zeromq, the script offers you one more argument to
-indicate zeromq location.  The installation commands of czmq can be:
+*: Since czmq depends on zeromq, the script offers you one more argument to indicate zeromq location.
+The installation commands of czmq can be:
 
-    $ ./install.sh czmq
-    /usr/local /usr/local/zeromq
+    $./install.sh czmq  /usr/local /usr/local/zeromq
 
-After the execution, czmq will be installed in /usr/local while zeromq is
-installed in /usr/local/zeromq.
+After the execution, czmq will be installed in /usr/local while zeromq is installed in /usr/local/zeromq.
 
-## FAQ
+### FAQ
 
-Q1:While compiling Singa and installing glog on max OS X, I get fatal error
+Q1:While compiling SINGA and installing glog on max OS X, I get fatal error
 "'ext/slist' file not found"
+
 A1:You may install glog individually and try command :
 
     $ make CFLAGS='-stdlib=libstdc++' CXXFLAGS='stdlib=libstdc++'
-#
 
-Q2:While compiling Singa, I get error "SSE2 instruction set not enabled"
+
+Q2:While compiling SINGA, I get error "SSE2 instruction set not enabled"
+
 A2:You can try following command:
 
     $ make CFLAGS='-msse2' CXXFLAGS='-msse2'
-#
+
+Q3:I get error "./configure --> cannot find blas_segmm() function" even I
+run "install.sh OpenBLAS".
+
+A3:Since OpenBLAS library is installed in /opt folder by default or
+/other/folder by your preference, you may edit your environment settings.
+You need add its default installation directories before linking, just
+run:
+
+    $ export LDFLAGS=-L/opt
+
+Or as an alternative option, you can also edit LIBRARY_PATH to figure it out.
+
+
+Q4:I get ImportError from google.protobuf.internal when I try to import .py
+files. (ImportError: cannot import name enum_type_wrapper)
+
+A4:After install google protobuf by "make install", we should install python
+runtime libraries. Go to protobuf source directory, run:
+
+    $ cd /PROTOBUF/SOURCE/FOLDER
+    $ cd python
+    $ python setup.py build
+    $ python setup.py install
+
+You may need "sudo" when you try to install python runtime libraries in
+system folder.

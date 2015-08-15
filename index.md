@@ -33,6 +33,8 @@ More details on contributing to SINGA is described [here](dev/contribute).
 * SINGA will be presented at [BOSS](http://boss.dima.tu-berlin.de/) of
 [VLDB 2015](http://www.vldb.org/2015/) at Hawai'i, 1 Sep, 2015.
 
+* We will present SINGA at [ADSC/I2R Deep Learning Workshop](http://adsc.illinois.edu/contact-us), 25 Aug, 2015.
+
 * We will give a talk on SINGA at VLDB summer school at Tsinghua University,
  25-31 July, 2015.
 
@@ -59,13 +61,16 @@ deep learning platform](http://www.comp.nus.edu.sg/~ooibc/singaopen-mm15.pdf). A
 [SINGA:putting deep learning in the hands of multimedia users](http://www.comp.nus.edu.sg/~ooibc/singa-mm15.pdf).
 ACM Multimedia 2015 ([BibTex]({{ BASE_PATH }}/assets/file/bib-singa.txt)).
 
+### License
+SINGA is released under [Apache License Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+
 
 ### Co-Sponsors
 
 <div >
-<img src="{{ BASE_PATH }}/assets/image/astar.jpg" width="200px"/>
-&nbsp;&nbsp;
 <img src="{{ BASE_PATH }}/assets/image/nus.png" width="170px"/>
+&nbsp;&nbsp;
+<img src="{{ BASE_PATH }}/assets/image/astar.jpg" width="200px"/>
 &nbsp;&nbsp;
 <img src="{{ BASE_PATH }}/assets/image/nrf_logo.png" width="270px"/>
 &nbsp;&nbsp;<br/><br/>
@@ -75,9 +80,6 @@ ACM Multimedia 2015 ([BibTex]({{ BASE_PATH }}/assets/file/bib-singa.txt)).
 &nbsp;&nbsp; &nbsp;&nbsp;
 <img src="{{ BASE_PATH }}/assets/image/zheda.png" width="100px"/>
 </div>
-
-### License
-SINGA is released under [Apache License Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
 
 <!--
