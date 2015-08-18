@@ -6,7 +6,7 @@ tags : [installation, examples]
 ---
 {% include JB/setup %}
 
-## Installation
+## SINGA Setup
 
 Clone the SINGA code from [Github](https://github.com/apache/incubator-singa)
 or Apache's git repository
@@ -24,7 +24,7 @@ If there are dependent libraries missing, please refer to the
 [installation]({{ BASE_PATH }}/docs/installation %}) page
 for guidance on installing them.
 
-### Start Zookeeper
+### Starting Zookeeper
 
 SINGA uses [zookeeper](https://zookeeper.apache.org/) to coordinate the
 training.  Please make sure the zookeeper service is on before running SINGA.
@@ -41,7 +41,7 @@ default port, please edit the `conf/singa.conf`:
 
     zookeeper_host: "localhost:YOUR_PORT"
 
-## Run in standalone mode
+## Running in standalone mode
 
 Running SINGA in standalone mode is on the contrary of running it using cluster
 managers like Mesos or YARN.
@@ -63,7 +63,7 @@ The hyper-parameters are set following
 available at [cnn example]({{ BASE_PATH }}/docs/cnn).
 
 
-#### Data and model preparation
+#### Preparing data and job configuration
 
 Download the dataset and create the data shards for training and testing.
 
@@ -178,8 +178,6 @@ The running command is the same as for single node training:
 
     ./bin/singa-run.sh -conf examples/cifar10/job.conf
 
-## Run with Mesos
+## Running with Mesos
 
 *in working*...
-
-## Run with YARN

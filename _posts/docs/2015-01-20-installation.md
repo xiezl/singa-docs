@@ -36,7 +36,7 @@ Optional dependencies include:
 
 SINGA comes with a script for installing the external libraries (see below).
 
-### Build SINGA From Source
+### Building SINGA From Source
 
 The build system of SINGA is based on GNU autotools. To build singa, you need gcc version >= 4.8.
 The common steps to build SINGA can be:

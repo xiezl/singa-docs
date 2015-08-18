@@ -6,37 +6,60 @@ tags : [installation, examples]
 ---
 {% include JB/setup %}
 
+## Configuration
+
 SINGA represents a neural net using a data structure called *NeuralNet*,
 which consists of a set of unidirectionally connected layers. Users configure
 the *NeuralNet* by listing all layers of the neural net and specifying
 each layer's source layer names.
 
+### Feed-forward models
+<div align = "left">
+<img src="{{ BASE_PATH }}/assets/image/mlp-net.png" align="center" width="200px"/>
+<span><strong>Figure 1. Net structure of a MLP model.</strong></span>
+</div>
+
+
+This representation is natural for feed-forward models, e.g., CNN and MLP. The
+configuration for the MLP model shown in Figure 1 is as follows,
+
     net {
       layer {
-        name : 'layer1"
-        type : kType1
+        name : 'data"
+        type : kData
       }
       layer {
-        name : 'layer2"
-        type : kType2
-        srclayer: 'layer1'
+        name : 'image"
+        type : kImage
+        srclayer: 'data'
       }
       layer {
-        name : 'layer3"
-        type : kType3
-        srclayer: 'layer1'
-        srclayer: 'layer2'
+        name : 'label"
+        type : kLabel
+        srclayer: 'data'
+      }
+      layer {
+        name : 'hidden"
+        type : kHidden
+        srclayer: 'image'
+      }
+      layer {
+        name : 'softmax"
+        type : kSoftmaxLoss
+        srclayer: 'hidden'
+        srclayer: 'label'
       }
     }
 
-<img src="{{ BASE_PATH }}/assets/image/rbm-rnn.png" align="center" width="400px"/>
-<span><strong>Figure 1. </strong></span>
+<img src="{{ BASE_PATH }}/assets/image/rbm-rnn.png" align="center" width="500px"/>
+<span><strong>Figure 2. Convert connections in RBM and RNN.</strong></span>
 
-This representation is natural for
-feed-forward models, e.g., CNN and MLP. For energy models including RBM, DBM,
+### Energy models
+
+For energy models including RBM, DBM,
 etc., their connections are undirected. To represent these models using
 *NeuralNet*, users can simply replace each connection with two directed
-connections, as shown in Figure 1a. In other words, for each pair of connected layers, their source
+connections, as shown in Figure 2a. In other words, for each pair of connected layers, their source
 layer field should include each other's name.  The full [RBM example]({{ BASE_PATH }}/docs/rbm) has
 detailed neural net configuration for a RBM model, which looks like
 
@@ -44,44 +67,200 @@ detailed neural net configuration for a RBM model, which looks like
       layer {
         name : "vis"
         type : kVisLayer
+        param {
+          name : "w1"
+        }
         srclayer: "hid"
       }
       layer {
         name : "hid"
         type : kHidLayer
+        param {
+          name : "w2"
+          share_from: "w1"
+        }
         srclayer: "vis"
       }
     }
 
+### RNN models
 For recurrent neural networks,
 users can remove the recurrent connections by unrolling the recurrent layer.
-For example, in Figure 1b, the original layer is unrolled into a new
+For example, in Figure 2b, the original layer is unrolled into a new
 layer with 4 internal layers. In this way, the model is
 like a normal feed-forward model, thus can be configured similarly. The
 [RNN example]({{ BASE_PATH }}/docs/rnn}) has a full neural net configuration for a RNN model.
 
-### Training, validation and test net
-Typically, a training job includes three neural nets for training, validation
-and test respectively. The three neural nets share most layers except the
-data layer, loss layer or output layer.
+## Creation
 
-	static shared_ptr<NeuralNet> Create(const NetProto& np, Phase phase, int num);
+    static shared_ptr<NeuralNet> NeuralNet::Create(const NetProto& np, Phase phase, int num);
 
 The above function creates a `NeuralNet` for a given phase, and returns a
-shared pointer to the neural net instance. The phase is in {kTrain,
+shared pointer to the `NeuralNet` instance. The phase is in {kTrain,
 kValidation, kTest}. `num` is used for net partitioning which indicates the
-number of partitions.
+number of partitions.  Typically, a training job includes three neural nets for
+training, validation and test phase respectively. The three neural nets share most
+layers except the data layer, loss layer or output layer, etc.. The `Create`
+function takes in the full net configuration including layers for training,
+validation and test.  It removes layers for phases other than the specified
+phase based on the `exclude` field in
+[layer configuration]({{ BASE_PATH }}/docs/layer):
 
-### Neural Net Partitioning
+    layer {
+      ...
+      exclude : kTest # filter this layer for creating test net
+    }
 
-{% comment %}
-When SINGA
-creates the *NeuralNet* instance, it also partitions the original neural
-net according to user's configuration to support parallel training of large
-models. Partitioning strategies include:
+The filtered net configuration is passed to the constructor of `NeuralNet`:
 
-  1. Partitioning all layers into different subsets.%, one worker per subset.
-  2. Partitioning each singe layer into sub-layers on batch dimension.
-  3. Partitioning each singe layer into sub-layers on feature dimension.
-  4. Hybrid partitioning of strategy 1, 2 and 3.
-{% endcomment %}
+    NeuralNet::NeuralNet(NetProto netproto, int npartitions);
+
+The constructor creates a graph representing the net structure firstly in
+
+    Graph* NeuralNet::CreateGraph(const NetProto& netproto, int npartitions);
+
+Next, it creates a layer for each node and connects layers if their nodes are
+connected.
+
+    void NeuralNet::CreateNetFromGraph(Graph* graph, int npartitions);
+
+Since the `NeuralNet` instance may be shared among multiple workers, the
+`Create` function returns a shared pointer to the `NeuralNet` instance .
+
+### Parameter sharing
+
+The [Param]({{ BASE_PATH }}/docs/param}) instance of one layer can be configured to
+share values with a Param instance of another layer. For example, the visible layer and
+hidden layer of a RBM shares the weight matrix, which is configured through the
+`share_from` field as shown in the above RBM configuration. `Param` sharing
+is enabled by first sharing the Param configuration (in `NeuralNet::Create`)
+to create two similar (e.g., the same shape) Param objects, and then calling
+(in `NeuralNet::CreateNetFromGraph`),
+
+    void Param::ShareFrom(const Param& from);
+
+It is also possible to share `Param`s of two nets, e.g., sharing parameters of
+the training net and the test net,
+
+    void NeuralNet:ShareParamsFrom(shared_ptr<NeuralNet> other);
+
+It will call `Param::ShareFrom` for each Param object.
+
+### Access functions
+`NeuralNet` provides a couple of access function to get the layers and params
+of the net:
+
+    const std::vector<Layer*>& layers() const;
+    const std::vector<Param*>& params() const ;
+    Layer* name2layer(string name) const;
+    Param* paramid2param(int id) const;
+
+
+## Partitioning
+A neural net can be partitioned in different ways to distribute the training
+over multiple workers:
+
+  1. Partitioning each singe layer into sub-layers on batch dimension (see
+  below). It is enabled by configuring the partition dimension of the layer to 0, e.g.,
+
+          # with other fields omitted
+          layer {
+            partition_dim: 0
+          }
+
+  2. Partitioning each singe layer into sub-layers on feature dimension (see
+  below).  It is enabled by configuring the partition dimension of the layer to 1, e.g.,
+
+          # with other fields omitted
+          layer {
+            partition_dim: 1
+          }
+
+  3. Partitioning all layers into different subsets. It is enabled by
+  configuring the location ID of a layer, e.g.,
+
+          # with other fields omitted
+          layer {
+            location: 1
+          }
+          layer {
+            location: 0
+          }
+
+
+  4. Hybrid partitioning of strategy 1, 2 and 3. An example configuration is like,
+
+          # with other fields omitted
+          layer {
+            location: 1
+          }
+          layer {
+            location: 0
+          }
+          layer {
+            partition_dim: 0
+            location: 0
+          }
+          layer {
+            partition_dim: 1
+            location: 0
+          }
+
+Currently SINGA supports strategy-2 well. Other partitioning strategies are
+are under test and will be release in later version.
+
+### Batch and feature dimension
+
+
+<img src="{{ BASE_PATH }}/assets/image/partition_fc.png" align="center" width="400px"/>
+<span><strong>Figure 3. Partitioning of a fully connected layer.</strong></span>
+
+
+Every layer's feature blob is considered a matrix whose rows are feature
+vectors. Thus, one layer can be split on two dimensions. Partitioning on
+dimension 0 (also called batch dimension) slices the feature matrix by rows.
+For instance, if the mini-batch size is 256 and the layer is partitioned into 2
+sub-layers, each sub-layer would have 128 feature vectors in its feature blob.
+Partitioning on this dimension has no effect on the parameters, as every
+`Param` object is replicated in the sub-layers. Partitioning on dimension
+1 (also called feature dimension) slices the feature matrix by columns. For
+example, suppose the original feature vector has 50 units, after partitioning
+into 2 sub-layers, each sub-layer would have 25 units. This partitioning may
+result in `Param` object being split, as shown in
+Figure 3. Both the bias vector and weight matrix are
+partitioned into two sub-layers.
+
+### Dispatching partitions to workers
+
+Each (partitioned) layer is assigned a location ID, based on which it is dispatched to one
+worker. Particularly, the shared pointer to the `NeuralNet` instance is passed
+to every worker within the same group, but each worker only computes over the
+layers that have the same partition (or location) ID as the worker's ID.  When
+every worker computes the gradients of the entire model parameters
+(strategy-2), we refer to this process as data parallelism.  When different
+workers compute the gradients of different parameters (strategy-3 or
+strategy-1), we call this process model parallelism.  The hybrid partitioning
+leads to hybrid parallelism where some workers compute the gradients of the
+same subset of model parameters while other workers compute on different model
+parameters.  For example, to implement the hybrid parallelism in for the
+[DCNN model](http://arxiv.org/abs/1404.5997), we set `partition_dim = 0` for
+lower layers and `partition_dim = 1` for higher layers.
+
+
+### Implementation
+
+SINGA partitions the neural net in `CreateGraph` function, which creates one
+node for each (partitioned) layer. For example, if one layer's partition
+dimension is 0 or 1, then it creates `npartition` nodes for it; if the
+partition dimension is -1, a single node is created, i.e., no partitioning.
+Each node is assigned a partition (or location) ID. If the original layer is
+configured with a location ID, then the ID is assigned to each newly created node.
+These nodes are connected according to the connections of the original layers.
+Some connection layers will be added automatically.
+For instance, if two connected sub-layers are located at two
+different workers, then a pair of bridge layers is inserted to transfer the
+feature (and gradient) blob between them. When two layers are partitioned on
+different dimensions, a concatenation layer which concatenates feature rows (or
+columns) and a slice layer which slices feature rows (or columns) would be
+inserted. These connection layers help making the network communication and
+synchronization transparent to the users.
