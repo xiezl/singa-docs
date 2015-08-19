@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Blog
+title: Apache SINGA |Blog
 header: Pages
 group: navigation
 ---

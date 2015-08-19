@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Communication
+title:  Communication
 category : docs
 tags : [rnn, example]
 ---

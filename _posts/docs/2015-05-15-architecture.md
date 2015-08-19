@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Architecture
+title:  Architecture
 category : docs
 tags : [architecture]
 ---

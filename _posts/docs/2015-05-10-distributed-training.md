@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Distributed Training
+title:  Distributed Training
 category : docs
 tags : [cluster topology, training frameworks]
 ---

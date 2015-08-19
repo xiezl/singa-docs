@@ -8,21 +8,9 @@ tags : [installation, examples]
 
 ## SINGA Setup
 
-Clone the SINGA code from [Github](https://github.com/apache/incubator-singa)
-or Apache's git repository
-
-    git clone git@github.com:apache/incubator-singa.git
-    or
-    git clone https://git-wip-us.apache.org/repos/asf/incubator-singa.git
-
-Compile SINGA:
-
-    ./configure
-    make
-
-If there are dependent libraries missing, please refer to the
+Please refer to the
 [installation]({{ BASE_PATH }}/docs/installation %}) page
-for guidance on installing them.
+for guidance on installing SINGA.
 
 ### Starting Zookeeper
 

@@ -1,6 +1,6 @@
 ---
 layout: page
-title: "Apache SINGA"
+title: Distributed Deep Learning System
 tagline:
 ---
 {% include JB/setup %}

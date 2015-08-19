@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Distributed Training Frameworks
+title:  Distributed Training Frameworks
 category : docs
 tags : [rnn, example]
 ---
