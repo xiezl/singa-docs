@@ -29,7 +29,7 @@ category.
 <span><strong>Figure 2 - Net structure of a MLP model.</strong></span>
 </div>
 
-Feed-forward models, e.g., CNN and MLP, can easily configured as their layer
+Feed-forward models, e.g., CNN and MLP, can easily get configured as their layer
 connections are undirected without circles. The
 configuration for the MLP model shown in Figure 1 is as follows,
 
@@ -204,7 +204,7 @@ There are 4 partitioning schemes, whose configurations are give below,
           }
 
 Currently SINGA supports strategy-2 well. Other partitioning strategies are
-are under test and will be release in later version.
+are under test and will be released in later version.
 
 ## Parameter sharing
 

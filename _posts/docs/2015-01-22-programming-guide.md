@@ -27,7 +27,7 @@ themselves. In addition, the training data must be prepared, which has the same
 
 Users can use the default main function provided SINGA to submit the training
 job. For this case, a job configuration file written as a google protocol
-buffer message for the [JobProto](/api/) must be provided in the command line,
+buffer message for the [JobProto]({{  BASE_PATH  }}/api/classsinga_1_1JobProto.html) must be provided in the command line,
 
     ./bin/singa-run.sh -conf <path to job conf> [-resume]
 
