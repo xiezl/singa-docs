@@ -15,7 +15,8 @@ for guidance on installing SINGA.
 ### Starting Zookeeper
 
 SINGA uses [zookeeper](https://zookeeper.apache.org/) to coordinate the
-training.  Please make sure the zookeeper service is on before running SINGA.
+training.  Please make sure the zookeeper service is started before running
+SINGA.
 
 If you installed the zookeeper using our thirdparty script, you can
 simply start it by:
@@ -23,6 +24,8 @@ simply start it by:
     #goto top level folder
     cd  SINGA_ROOT
     ./bin/zk-service start
+
+(`./bin/zk-service stop` stops the zookeeper).
 
 Otherwise, if you launched a zookeeper by yourself but not used the
 default port, please edit the `conf/singa.conf`:
@@ -43,7 +46,7 @@ CPU and memory resources as it needs.
 
 ### Training on a single node
 
-For single node training, one process will be launched to run SINGA on
+For single node training, one process will be launched to run SINGA at
 local host. We train the [CNN model](http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks) over the
 [CIFAR-10](http://www.cs.toronto.edu/~kriz/cifar.html) dataset as an example.
 The hyper-parameters are set following
@@ -60,7 +63,7 @@ Download the dataset and create the data shards for training and testing.
     make create
 
 A training dataset and a test dataset are created under *cifar10-train-shard*
-and *cifar10-test-shard* folder respectively. An image_mean.bin file is also
+and *cifar10-test-shard* folder respectively. An *image_mean.bin* file is also
 generated, which contains the feature mean of all images.
 
 Since all code used for training this CNN model is provided by SINGA as
@@ -76,7 +79,7 @@ In other words, neither the training data nor the neural net is partitioned.
 
 The training is started by running:
 
-    #goto top level folder
+    # goto top level folder
     cd ../../
     ./bin/singa-run.sh -conf examples/cifar10/job.conf
 
@@ -99,7 +102,7 @@ described in the [System Architecture]() page.
       workspace: "examples/cifar10/"
     }
 
-Change the original job.conf with the above cluster setting. By default, each
+Change the original *job.conf* with the above cluster setting. By default, each
 worker group has one worker. Since one process is set to contain two workers.
 The two worker groups will run in the same process.  Consequently, they run
 the in-memory [Downpour]({{ BASE_PATH }}/docs/distributed-training) training framework.
@@ -134,14 +137,14 @@ The running command is:
       workspace: "examples/cifar10/"
     }
 
-Change the original job.conf with the above cluster configuration.
+Change the original *job.conf* with the above cluster configuration.
 It sets one worker group with two workers. The workers will run synchronously
-as they are from the same worker group. This framework is in-memory
+as they are from the same worker group. This framework is the in-memory
 [sandblaster]({{ BASE_PATH }}/docs/distributed-training).
 The model is partitioned among the two workers. In specific, each layer is
-sliced such that every worker is assigned one sliced layer.  The sliced layer
-is the same as the original layer except that it only has B/g feature
-instances, where B is the size of instances in a mini-batch, g is the number of
+sliced over the two workers.  The sliced layer
+is the same as the original layer except that it only has `B/g` feature
+instances, where `B` is the number of instances in a mini-batch, `g` is the number of
 workers in a group. It is also possible to partition the layer (or neural net)
 using [other schemes]({{ BASE_PATH }}/docs/neural-net).
 All other settings are the same as running without partitioning
@@ -155,8 +158,8 @@ cluster configuration with:
 
     nworker_per_procs: 1
 
-Every process would then create only one worker thread. The hostfile
-must be provided in SINGA_ROOT/hostfile specifying the nodes in the cluster,
+Every process would then create only one worker thread. The *hostfile*
+must be provided under *SINGA_ROOT/conf/* specifying the nodes in the cluster,
 e.g.,
 
     logbase-a01
@@ -169,3 +172,9 @@ The running command is the same as for single node training:
 ## Running with Mesos
 
 *in working*...
+
+
+## Where to go next
+
+The [programming guide]({{ BASE_PATH }}/docs/programming-guide) pages will
+describe how to submit a training job in SINGA.

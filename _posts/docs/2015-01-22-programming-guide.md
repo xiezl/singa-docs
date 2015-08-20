@@ -6,19 +6,51 @@ tags : [programming]
 ---
 {% include JB/setup %}
 
+<img src="{{ BASE_PATH }}/assets/image/overview.png" align="center" width="400px"/>
+<span><strong>Figure 1 - SINGA Overview.</strong></span>
 
-Each training job has a main function that
+To submit a training job, users must provide the configuration of the
+four components shown in Figure 1:
 
-  * initializes SINGA, e.g., setup logging.
+  * a [NeuralNet]({{ BASE_PATH }}/docs/neural-net) describing the neural net structure with the detailed layer setting and their connections;
+  * a [TrainOneBatch]({{ BASE_PATH }}/docs/train-one-batch) algorithm which is tailored for different model categories;
+  * an [Updater]({{ BASE_PATH }}/docs/updater) defining the protocol for updating parameters at the server side;
+  * a [Cluster Topology]({{ BASE_PATH }}/docs/distributed-training) specifying the distributed architecture of workers and servers.
 
-  * registers the layers (and other components) implemented by users.
+The *Basic user guide* section describes how to submit a training job using
+built-in components; while the *Advanced user guide* section presents details
+on writing user's own main function to register components implemented by
+themselves. In addition, the training data must be prepared, which has the same
+[process]({{ BASE_PATH }}/docs/data) for both advanced users and basic users.
 
-  * passes the job configuration to SINGA driver, including,
+## Basic user guide
 
-    * a [NeuralNet]({{ BASE_PATH }}/docs/neural-net) describing the neural net structure with the detailed layer setting and their connections;
-    * a [TrainOneBatch]({{ BASE_PATH }}/docs/train-one-batch) algorithm which is tailored for different model categories;
-    * an [Updater]({{ BASE_PATH }}/docs/updater) defining the protocol for updating parameters at the server side;
-    * a [Cluster Topology]({{ BASE_PATH }}/docs/distributed-training) specifying the distributed architecture of workers and servers.
+Users can use the default main function provided SINGA to submit the training
+job. For this case, a job configuration file written as a google protocol
+buffer message for the [JobProto](/api/) must be provided in the command line,
+
+    ./bin/singa-run.sh -conf <path to job conf> [-resume]
+
+`-resume` is for continuing the training from last
+[checkpoint]({{ BASE_PATH }}/docs/checkpoint).
+The [MLP]({{ BASE_PATH }}/docs/mlp) and [CNN]({{ BASE_PATH }}/docs/cnn)
+examples use built-in components. Please read the corresponding pages for their
+job configuration files. The subsequent pages will illustrate the details on
+each component of the configuration.
+
+## Advanced user guide
+
+If a user's model contains some user-defined components, e.g.,
+[Updater]({{ BASE_PATH }}/docs/updater), he has to write a main function to
+register these components. It is similar to Hadoop's main function. Generally,
+the main function should
+
+  * initialize SINGA, e.g., setup logging.
+
+  * register user-defined components.
+
+  * create and pass the job configuration to SINGA driver
+
 
 An example main function is like
 
@@ -31,9 +63,8 @@ An example main function is like
       bool resume;
       // parse resume option from argv.
 
-      // register all user defined layers
+      // register user defined layers
       driver.RegisterLayer<FooLayer>(kFooLayer);
-
       // register user defined updater
       driver.RegisterUpdater<FooUpdater>(kFooUpdater);
       ...
@@ -44,8 +75,8 @@ An example main function is like
       return 0;
     }
 
-The Driver class' Init method will load a job configuration file provided by
-users as one command line argument (`-conf <job conf>`). It contains at least the
+The Driver class' `Init` method will load a job configuration file provided by
+users as a command line argument (`-conf <job conf>`). It contains at least the
 cluster topology and returns the `jobConf` for users to update or fill in
 configurations of neural net, updater, etc. If users define subclasses of
 Layer, Updater, Worker and Param, they should register them through the driver.
@@ -56,16 +87,11 @@ We will provide helper functions to make the configuration easier in the
 future, like [keras](https://github.com/fchollet/keras).
 
 Users need to compile and link their code (e.g., layer implementations and the main
-file) with singa library (`.libs/libsinga.so`) to generate an
-executable file, e.g., with name `mysinga`.  To launch the program, users just pass the
-path of the `mysinga` and base job configuration to `./bin/singa-run.sh`.
+file) with SINGA library (*.libs/libsinga.so*) to generate an
+executable file, e.g., with name *mysinga*.  To launch the program, users just pass the
+path of the *mysinga* and base job configuration to *./bin/singa-run.sh*.
 
     ./bin/singa-run.sh -conf <path to job conf> -exec <path to mysinga> [other arguments]
 
-The default main.cc is complied and linked to generate an executable
-`singa`, which is passed to `singa-run.sh` if `-exec` is not specified by users.
-The default main.cc can be used only if there are no
-user classes to register, i.e., the model can be trained using SINGA built-in
-classes. The [RNN application]({{ BASE_PATH }}/docs/rnn) provides a full example of
-implementing new layers, and the main function for training a specific RNN
-model.
+The [RNN application]({{ BASE_PATH }}/docs/rnn) provides a full example of
+implementing the main function for training a specific RNN model.
