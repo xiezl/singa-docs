@@ -12,11 +12,11 @@ SINGA is developed and tested on Linux platforms with the following external lib
 
 The following dependenies are required:
 
-  * glog version 0.3.3.
+  * glog version 0.3.3
 
-  * google-protobuf version 2.6.0.
+  * google-protobuf version 2.6.0
 
-  * openblas version >= 0.2.10.
+  * openblas version >= 0.2.10
 
   * zeromq version >= 3.2
 
@@ -27,16 +27,16 @@ The following dependenies are required:
 
 Optional dependencies include:
 
-  * gtest version 1.7.0.
+  * gtest version 1.7.0
 
-  * opencv version 2.4.9.
+  * opencv version 2.4.9
 
   * lmdb version 0.9.10
 
 
 SINGA comes with a script for installing the external libraries (see below).
 
-### Building SINGA From Source
+### Building SINGA from source
 
 The build system of SINGA is based on GNU autotools. To build SINGA, you need gcc version >= 4.8.
 The common steps to build SINGA can be:

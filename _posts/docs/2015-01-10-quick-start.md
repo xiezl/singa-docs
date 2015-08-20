@@ -6,7 +6,7 @@ tags : [installation, examples]
 ---
 {% include JB/setup %}
 
-## SINGA Setup
+## SINGA setup
 
 Please refer to the
 [installation]({{ BASE_PATH }}/docs/installation %}) page
@@ -83,6 +83,8 @@ The training is started by running:
     cd ../../
     ./bin/singa-run.sh -conf examples/cifar10/job.conf
 
+(`./bin/singa-console.sh kill JOB_ID` kills the job, JOB_ID is printed after
+the job is started)
 
 {% comment %}
 One worker group trains against one partition of the training dataset. If

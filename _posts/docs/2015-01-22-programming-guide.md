@@ -7,7 +7,7 @@ tags : [programming]
 {% include JB/setup %}
 
 <img src="{{ BASE_PATH }}/assets/image/overview.png" align="center" width="400px"/>
-<span><strong>Figure 1 - SINGA Overview.</strong></span>
+<span><strong>Figure 1 - SINGA overview.</strong></span>
 
 To submit a training job, users must provide the configuration of the
 four components shown in Figure 1:
