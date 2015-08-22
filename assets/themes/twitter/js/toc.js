@@ -4,7 +4,7 @@
     var defaults = {
       noBackToTopLinks: true,
       title: '<strong>Table of Contents</strong>',
-      minimumHeaders: 3,
+      minimumHeaders: 2,
       headers: 'h1, h2, h3, h4, h5, h6',
       listType: 'ul', // values: [ol|ul]
       showEffect: 'show', // values: [show|slideDown|fadeIn|none]
