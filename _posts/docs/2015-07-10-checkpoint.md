@@ -27,6 +27,7 @@ Checkpointing is controlled by two configuration fields:
 For example,
 
     # job.conf
+    workspace: "WORKSPACE"
     checkpoint_after: 100
     checkpoint_frequency: 300
     ...
