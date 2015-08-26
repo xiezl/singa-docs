@@ -5,6 +5,8 @@ tagline:
 ---
 {% include JB/setup %}
 
+NOTICE: We are organizing a [workshop on deep learning]({{ BASE_PATH }}/workshop).
+
 ### Getting Started
 * The [Introduction]({{ BASE_PATH }}{% post_url /docs/2015-01-01-overview %}) page gives an overview of SINGA.
 
