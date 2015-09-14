@@ -1,3 +1,20 @@
+.table-title td{
+border:0px;
+}
+.table-title tr{
+background:white;
+}
+table th{
+background: #31849B;
+}
+table tr{
+background: #D2EAF1;
+}
+table td{
+  border:1.0pt solid #4BACC6;
+  padding:2.0pt;
+}
+
 #banner{
 background-color: #F8F8F8;
 height:200px;
@@ -20,6 +37,7 @@ text-align: center;
   float:right;
   margin-top: 100px;
 }
+
 #logos{
   margin: 0px auto;
   width:540px;
