@@ -12,6 +12,9 @@ Please refer to the
 [installation]({{ BASE_PATH }}/docs/installation}) page
 for guidance on installing SINGA.
 
+Alternatively, you can download the [VirtualBox images](https://drive.google.com/folderview?id=0B8RYMMCkk170fm1nUzJGdU5ja2ZGdUhpWjlFNGxKZ2JIS0VWSUJ5RFhMNHdKRjZaNVFWTzA&usp=sharing_eid#list)
+(one for 32-bit systems, and one for 64-bit systems), which have installed all dependent libraries.
+
 ### Starting Zookeeper
 
 SINGA uses [zookeeper](https://zookeeper.apache.org/) to coordinate the

@@ -22,7 +22,9 @@ and [MLP]({{ BASE_PATH }}/docs/mlp), and [RNN]({{ BASE_PATH }}/docs/rnn) models 
 
 
     # in job.conf
-    alg: kBP
+    train_one_batch{
+      alg: kBP
+    }
 
 To use the BP algorithm for the `TrainOneBatch` function, users just simply
 configure the `alg` field with `kBP`. If a neural net contains user-defined
@@ -36,9 +38,11 @@ implementation of the BP algorithm in SINGA (see below).
 computing gradients of energy models like RBM.
 
     # job.conf
-    alg: kCD
-    cd_conf {
-      cd_k: 2
+    train_one_batch{
+      alg: kCD
+      cd_conf {
+        cd_k: 2
+      }
     }
 
 To use the CD algorithm for the `TrainOneBatch` function, users just configure
@@ -156,12 +160,12 @@ Users can define some fields for users to configure
       optional int32 b = 1;
     }
 
-    extend JobProto {
+    extend AlgProto {
       optional FooWorkerProto foo_conf = 101;
     }
 
     # in job.proto
-    JobProto {
+    AlgProto {
       ...
       extension 101..max;
     }
@@ -172,12 +176,13 @@ To use `FooWorker`, users need to register it in the [main.cc]({{ BASE_PATH }}/d
 and configure the `alg` and `foo_conf` fields,
 
     # in main.cc
-    const int kFoo = 3; // worker ID, must be different to that of CDWorker and BPWorker
-    driver.RegisterWorker<FooWorker>(kFoo);
+    driver.RegisterWorker<FooWorker, string>("fooalg");
 
     # in job.conf
     ...
-    alg: 3
-    [foo_conf] {
-      b = 4;
+    train_one_batch{
+      user_alg: "fooalg"
+      [foo_conf] {
+        b = 4;
+      }
     }
