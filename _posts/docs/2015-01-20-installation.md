@@ -66,19 +66,21 @@ There are three ways to build SINGA,
         $ ./configure --enable-lmdb
 
 
-  * In case you do not have the GNU auto tools to run `autogen.sh`, SINGA
-  provides a Makefile.example file, which is used as
+  * The SINGA test is not included by default settings. If you want to run the
+    test, please compile with `--enable-test`. You can run:
+  
 
-        $ cp Makefile.example Makefile
+        $ ./configure --enable-test
         $ make
 
-    Code depending on lmdb can be added into the compilation by
+    After compilation, you will find the binary file singatest. Just run it!
+	More details about configure script can be found by running:
 
-        make -DUSE_LMDB
+		$ ./configure --help
 
 
-After compiling SINGA successfully, the `libsinga.so` will be generated into
-.lib/ folder and an executable file `singa` is generated under bin/.
+After compiling SINGA successfully, the `libsinga.so` and the executable file `singa` will be generated into
+default folder.
 
 If some dependent libraries are missing (or not detected), you can use the
 following script to download and install them:
